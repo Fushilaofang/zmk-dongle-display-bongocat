@@ -22,6 +22,7 @@ if(CONFIG_ZMK_DISPLAY AND CONFIG_ZMK_DISPLAY_STATUS_SCREEN_CUSTOM AND ((NOT CONF
     endif()
         zephyr_library_sources(widgets/output_status.c)
         zephyr_library_sources(widgets/output_status_sym.c)
+        zephyr_library_sources(widgets/status.c)
     if (CONFIG_ZMK_BATTERY)
         zephyr_library_sources(widgets/battery_status.c)
     endif()

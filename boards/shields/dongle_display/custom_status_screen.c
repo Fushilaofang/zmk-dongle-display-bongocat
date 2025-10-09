@@ -11,12 +11,14 @@
 #include "widgets/layer_status.h"
 #include "widgets/output_status.h"
 #include "widgets/hid_indicators.h"
+#include "widgets/status.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 static struct zmk_widget_output_status output_status_widget;
 static struct zmk_widget_dongle_battery_status dongle_battery_status_widget;
+static struct zmk_widget_status status_widget;
 
 #if IS_ENABLED(CONFIG_ZMK_DONGLE_DISPLAY_LAYER)
 static struct zmk_widget_layer_status layer_status_widget;
@@ -49,6 +51,10 @@ lv_obj_t *zmk_display_status_screen() {
     
     zmk_widget_output_status_init(&output_status_widget, screen);
     lv_obj_align(zmk_widget_output_status_obj(&output_status_widget), LV_ALIGN_TOP_LEFT, 0, 0);
+
+    /* WPM status widget: 放在屏幕中间 */
+    zmk_widget_status_init(&status_widget, screen);
+    lv_obj_align(zmk_widget_status_obj(&status_widget), LV_ALIGN_CENTER, 0, 0);
     
 #if IS_ENABLED(CONFIG_ZMK_DONGLE_DISPLAY_BONGO_CAT)
     zmk_widget_bongo_cat_init(&bongo_cat_widget, screen);
