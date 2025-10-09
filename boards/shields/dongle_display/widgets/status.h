@@ -12,6 +12,11 @@
 
 #define CANVAS_SIZE 68
 
+/* 状态结构：仅保留 WPM 历史 10 个样本 */
+struct status_state {
+    uint8_t wpm[10];
+};
+
 struct zmk_widget_status {
     sys_snode_t node;
     lv_obj_t *obj;
