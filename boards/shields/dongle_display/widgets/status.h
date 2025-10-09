@@ -10,6 +10,8 @@
 #include <lvgl.h>
 #include <zephyr/kernel.h>
 
+#define CANVAS_SIZE 68
+
 struct zmk_widget_status {
     sys_snode_t node;
     lv_obj_t *obj;
