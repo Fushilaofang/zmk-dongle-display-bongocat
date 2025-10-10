@@ -54,7 +54,7 @@ lv_obj_t *zmk_display_status_screen() {
 
     /* WPM status widget: 放在屏幕中间 */
     zmk_widget_status_init(&status_widget, screen);
-    lv_obj_align(zmk_widget_status_obj(&status_widget), LV_ALIGN_CENTER, 0, 0);
+    lv_obj_align(zmk_widget_status_obj(&status_widget), LV_ALIGN_CENTER, 0, -15);
     
 #if IS_ENABLED(CONFIG_ZMK_DONGLE_DISPLAY_BONGO_CAT)
     zmk_widget_bongo_cat_init(&bongo_cat_widget, screen);
