@@ -146,10 +146,11 @@ static void set_status_symbol(lv_obj_t *widget, struct output_status_state state
         lv_img_set_src(usb_hid_status, &sym_nok);
     }
 
-    /* 使用文本标签显示蓝牙设备数字，避免图片符号像素缺失 */
-    char bt_num_text[2];
-    snprintf(bt_num_text, sizeof(bt_num_text), "%d", state.active_profile_index + 1);
-    lv_label_set_text(bt_number, bt_num_text);
+    if (state.active_profile_index < (sizeof(sym_num) / sizeof(lv_img_dsc_t *))) {
+        lv_img_set_src(bt_number, sym_num[state.active_profile_index]);
+    } else {
+        lv_img_set_src(bt_number, &sym_nok);
+    }
     
     if (state.active_profile_bonded) {
         if (state.active_profile_connected) {
@@ -178,7 +179,9 @@ ZMK_SUBSCRIPTION(widget_output_status, zmk_usb_conn_state_changed);
 int zmk_widget_output_status_init(struct zmk_widget_output_status *widget, lv_obj_t *parent) {
     widget->obj = lv_obj_create(parent);
 
-    lv_obj_set_size(widget->obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_size(widget->obj, 50, 30);  // 增加固定尺寸确保足够空间
+    lv_obj_clear_flag(widget->obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_clip_corner(widget->obj, false, 0);
 
     lv_obj_t *usb = lv_img_create(widget->obj);
     lv_obj_align(usb, LV_ALIGN_TOP_LEFT, 1, 4);
@@ -191,14 +194,13 @@ int zmk_widget_output_status_init(struct zmk_widget_output_status *widget, lv_ob
     lv_obj_align_to(bt, usb, LV_ALIGN_OUT_RIGHT_TOP, 6, 0);
     lv_img_set_src(bt, &sym_bt);
 
-    /* 使用 label 而非图片来显示蓝牙设备数字，避免像素缺失 */
-    lv_obj_t *bt_number = lv_label_create(widget->obj);
-    lv_label_set_text(bt_number, "1");
-    lv_obj_set_style_text_font(bt_number, &lv_font_montserrat_6, LV_PART_MAIN);
-    lv_obj_align_to(bt_number, bt, LV_ALIGN_OUT_RIGHT_TOP, 2, 1);
+    lv_obj_t *bt_number = lv_img_create(widget->obj);
+    lv_obj_align_to(bt_number, bt, LV_ALIGN_OUT_RIGHT_TOP, 2, 7);
+    lv_obj_clear_flag(bt_number, LV_OBJ_FLAG_OVERFLOW_VISIBLE);
 
     lv_obj_t *bt_status = lv_img_create(widget->obj);
-    lv_obj_align_to(bt_status, bt_number, LV_ALIGN_OUT_BOTTOM_LEFT, -2, -6);
+    lv_obj_align_to(bt_status, bt, LV_ALIGN_OUT_RIGHT_TOP, 2, 1);
+    lv_obj_clear_flag(bt_status, LV_OBJ_FLAG_OVERFLOW_VISIBLE);
     
     static lv_style_t style_line;
     lv_style_init(&style_line);
