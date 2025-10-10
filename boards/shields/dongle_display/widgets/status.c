@@ -47,13 +47,16 @@ static void draw_wpm_canvas(lv_obj_t *canvas_obj, const struct status_state *sta
     /* Fill background */
     lv_canvas_draw_rect(canvas, 0, 0, CANVAS_SIZE, CANVAS_SIZE, &rect_black_dsc);
 
-    /* Draw WPM box and value */
-    lv_canvas_draw_rect(canvas, 0, 21, 68, 42, &rect_white_dsc);
-    lv_canvas_draw_rect(canvas, 1, 22, 66, 40, &rect_black_dsc);
+    /* Draw WPM box and value (vertically centered) */
+    const int box_h = 42;
+    const int box_top = (CANVAS_SIZE - box_h) / 2; /* center vertically */
+    lv_canvas_draw_rect(canvas, 0, box_top, 68, box_h, &rect_white_dsc);
+    lv_canvas_draw_rect(canvas, 1, box_top + 1, 66, box_h - 2, &rect_black_dsc);
 
     char wpm_text[6] = {};
     snprintf(wpm_text, sizeof(wpm_text), "%d", state->wpm[9]);
-    lv_canvas_draw_text(canvas, 42, 52, 24, &label_dsc_wpm, wpm_text);
+    /* place WPM value relative to box_top */
+    lv_canvas_draw_text(canvas, 42, box_top + 31, 24, &label_dsc_wpm, wpm_text);
 
     int max = 0;
     int min = 256;
@@ -75,7 +78,8 @@ static void draw_wpm_canvas(lv_obj_t *canvas_obj, const struct status_state *sta
     lv_point_t points[10];
     for (int i = 0; i < 10; i++) {
         points[i].x = 2 + i * 7;
-        points[i].y = 60 - (state->wpm[i] - min) * 36 / range;
+        /* graph area height = box_h - 2 (inner), map into vertical space */
+        points[i].y = box_top + 28 - (state->wpm[i] - min) * (box_h - 10) / range;
     }
     lv_canvas_draw_line(canvas, points, 10, &line_dsc);
 
