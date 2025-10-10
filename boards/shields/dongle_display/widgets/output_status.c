@@ -5,6 +5,7 @@
  */
 
 #include <zephyr/kernel.h>
+#include <stdio.h>
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
@@ -28,20 +29,6 @@ LV_IMG_DECLARE(sym_bt);
 LV_IMG_DECLARE(sym_ok);
 LV_IMG_DECLARE(sym_nok);
 LV_IMG_DECLARE(sym_open);
-LV_IMG_DECLARE(sym_1);
-LV_IMG_DECLARE(sym_2);
-LV_IMG_DECLARE(sym_3);
-LV_IMG_DECLARE(sym_4);
-LV_IMG_DECLARE(sym_5);
-
-const lv_img_dsc_t *sym_num[] = {
-    &sym_1,
-    &sym_2,
-    &sym_3,
-    &sym_4,
-    &sym_5,
-};
-
 enum output_symbol {
     output_symbol_usb,
     output_symbol_usb_hid_status,
@@ -146,10 +133,14 @@ static void set_status_symbol(lv_obj_t *widget, struct output_status_state state
         lv_img_set_src(usb_hid_status, &sym_nok);
     }
 
-    if (state.active_profile_index < (sizeof(sym_num) / sizeof(lv_img_dsc_t *))) {
-        lv_img_set_src(bt_number, sym_num[state.active_profile_index]);
-    } else {
-        lv_img_set_src(bt_number, &sym_nok);
+    if (state.active_profile_index >= 0) {
+        char profile_text[8];
+        if (state.active_profile_index < 99) {
+            snprintf(profile_text, sizeof(profile_text), "%d", state.active_profile_index + 1);
+        } else {
+            snprintf(profile_text, sizeof(profile_text), "%s", LV_SYMBOL_CLOSE);
+        }
+        lv_label_set_text(bt_number, profile_text);
     }
     
     if (state.active_profile_bonded) {
@@ -176,6 +167,9 @@ ZMK_SUBSCRIPTION(widget_output_status, zmk_ble_active_profile_changed);
 #endif
 ZMK_SUBSCRIPTION(widget_output_status, zmk_usb_conn_state_changed);
 
+static lv_style_t bt_number_style;
+static bool bt_number_style_initialized;
+
 int zmk_widget_output_status_init(struct zmk_widget_output_status *widget, lv_obj_t *parent) {
     widget->obj = lv_obj_create(parent);
 
@@ -192,8 +186,16 @@ int zmk_widget_output_status_init(struct zmk_widget_output_status *widget, lv_ob
     lv_obj_align_to(bt, usb, LV_ALIGN_OUT_RIGHT_TOP, 6, 0);
     lv_img_set_src(bt, &sym_bt);
 
-    lv_obj_t *bt_number = lv_img_create(widget->obj);
-    lv_obj_align_to(bt_number, bt, LV_ALIGN_OUT_RIGHT_TOP, 2, 7);
+    if (!bt_number_style_initialized) {
+        lv_style_init(&bt_number_style);
+        lv_style_set_text_font(&bt_number_style, &lv_font_unscii_8);
+        bt_number_style_initialized = true;
+    }
+
+    lv_obj_t *bt_number = lv_label_create(widget->obj);
+    lv_obj_add_style(bt_number, &bt_number_style, 0);
+    lv_label_set_text(bt_number, "1");
+    lv_obj_align_to(bt_number, bt, LV_ALIGN_OUT_RIGHT_MID, 4, 0);
 
     lv_obj_t *bt_status = lv_img_create(widget->obj);
     lv_obj_align_to(bt_status, bt, LV_ALIGN_OUT_RIGHT_TOP, 2, 1);
