@@ -81,17 +81,19 @@ static void set_battery_symbol(lv_obj_t *widget, struct battery_state state) {
     lv_obj_t *symbol = battery_objects[state.source].symbol;
     lv_obj_t *label = battery_objects[state.source].label;
 
-    draw_battery(symbol, state.level, state.usb_present);
-    lv_label_set_text_fmt(label, "%4u%%", state.level);
-    
     if (state.level > 0 || state.usb_present) {
+        draw_battery(symbol, state.level, state.usb_present);
+        lv_label_set_text_fmt(label, "%4u%%", state.level);
         lv_obj_clear_flag(symbol, LV_OBJ_FLAG_HIDDEN);
         lv_obj_move_foreground(symbol);
         lv_obj_clear_flag(label, LV_OBJ_FLAG_HIDDEN);
         lv_obj_move_foreground(label);
     } else {
+        /* 无电量数据：隐藏图标，显示占位文本 "--" */
+        lv_label_set_text(label, "  --");
         lv_obj_add_flag(symbol, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_add_flag(label, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(label, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_move_foreground(label);
     }
 }
 
