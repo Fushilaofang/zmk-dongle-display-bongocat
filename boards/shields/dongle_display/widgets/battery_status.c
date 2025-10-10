@@ -13,9 +13,13 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/battery.h>
 #include <zmk/ble.h>
 #include <zmk/display.h>
+#include <zmk/event_manager.h>
 #include <zmk/events/battery_state_changed.h>
 #include <zmk/events/usb_conn_state_changed.h>
-#include <zmk/event_manager.h>
+#include <zmk/events/endpoint_changed.h>
+#if IS_ENABLED(CONFIG_ZMK_BLE)
+#  include <zmk/events/ble_active_profile_changed.h>
+#endif
 #include <zmk/usb.h>
 
 #include "battery_status.h"
