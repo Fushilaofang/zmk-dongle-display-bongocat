@@ -81,8 +81,8 @@ static void set_battery_symbol(lv_obj_t *widget, struct battery_state state) {
     lv_obj_t *symbol = battery_objects[state.source].symbol;
     lv_obj_t *label = battery_objects[state.source].label;
 
-    if (state.level > 0 || state.usb_present) {
-        /* 有电量或 USB 电源：绘制电池并显示百分比 */
+    if (state.level > 0) {
+        /* 仅在有电量数据时绘制电池并显示百分比 */
         draw_battery(symbol, state.level, state.usb_present);
         lv_label_set_text_fmt(label, "%4u%%", state.level);
         lv_obj_clear_flag(symbol, LV_OBJ_FLAG_HIDDEN);
@@ -156,6 +156,10 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_dongle_battery_status, struct battery_state,
                             battery_status_update_cb, battery_status_get_state)
 
 ZMK_SUBSCRIPTION(widget_dongle_battery_status, zmk_peripheral_battery_state_changed);
+ZMK_SUBSCRIPTION(widget_dongle_battery_status, zmk_endpoint_changed);
+#if IS_ENABLED(CONFIG_ZMK_BLE)
+ZMK_SUBSCRIPTION(widget_dongle_battery_status, zmk_ble_active_profile_changed);
+#endif
 
 #if IS_ENABLED(CONFIG_ZMK_DONGLE_DISPLAY_DONGLE_BATTERY)
 #if !IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
