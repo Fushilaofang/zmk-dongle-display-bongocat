@@ -180,10 +180,6 @@ int zmk_widget_output_status_init(struct zmk_widget_output_status *widget, lv_ob
     widget->obj = lv_obj_create(parent);
 
     lv_obj_set_size(widget->obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    // 禁用裁剪以防止子对象底部被截断
-    lv_obj_clear_flag(widget->obj, LV_OBJ_FLAG_CLIP_CORNER);
-    // 添加内边距确保子对象有足够空间
-    lv_obj_set_style_pad_all(widget->obj, 2, 0);
 
     lv_obj_t *usb = lv_img_create(widget->obj);
     lv_obj_align(usb, LV_ALIGN_TOP_LEFT, 1, 4);
