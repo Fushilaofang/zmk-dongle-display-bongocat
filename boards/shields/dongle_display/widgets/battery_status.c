@@ -13,13 +13,9 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/battery.h>
 #include <zmk/ble.h>
 #include <zmk/display.h>
-#include <zmk/event_manager.h>
 #include <zmk/events/battery_state_changed.h>
 #include <zmk/events/usb_conn_state_changed.h>
-#include <zmk/events/endpoint_changed.h>
-#if IS_ENABLED(CONFIG_ZMK_BLE)
-#  include <zmk/events/ble_active_profile_changed.h>
-#endif
+#include <zmk/event_manager.h>
 #include <zmk/usb.h>
 
 #include "battery_status.h"
@@ -85,42 +81,17 @@ static void set_battery_symbol(lv_obj_t *widget, struct battery_state state) {
     lv_obj_t *symbol = battery_objects[state.source].symbol;
     lv_obj_t *label = battery_objects[state.source].label;
 
-    if (state.level > 0) {
-        /* 仅在有电量数据时绘制电池并显示百分比 */
-        draw_battery(symbol, state.level, state.usb_present);
-        lv_label_set_text_fmt(label, "%4u%%", state.level);
+    draw_battery(symbol, state.level, state.usb_present);
+    lv_label_set_text_fmt(label, "%4u%%", state.level);
+    
+    if (state.level > 0 || state.usb_present) {
         lv_obj_clear_flag(symbol, LV_OBJ_FLAG_HIDDEN);
         lv_obj_move_foreground(symbol);
         lv_obj_clear_flag(label, LV_OBJ_FLAG_HIDDEN);
         lv_obj_move_foreground(label);
     } else {
-        /* 无电量数据：
-         * - 中央（source==0）：显示占位 "--"
-         * - 外围（source>=SOURCE_OFFSET）：仅当对应 BLE profile 已连接时显示占位，否则隐藏
-         */
-        if (state.source == 0) {
-            /* central: 显示占位 */
-            lv_label_set_text(label, "  --");
-            lv_obj_add_flag(symbol, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_clear_flag(label, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_move_foreground(label);
-        } else {
-            int profile_idx = state.source - SOURCE_OFFSET;
-            bool prof_connected = false;
-#if defined(CONFIG_ZMK_BLE)
-            prof_connected = zmk_ble_profile_is_connected(profile_idx);
-#endif
-            if (prof_connected) {
-                lv_label_set_text(label, "  --");
-                lv_obj_add_flag(symbol, LV_OBJ_FLAG_HIDDEN);
-                lv_obj_clear_flag(label, LV_OBJ_FLAG_HIDDEN);
-                lv_obj_move_foreground(label);
-            } else {
-                /* 外围未连接或已断开：隐藏占位和图标 */
-                lv_obj_add_flag(symbol, LV_OBJ_FLAG_HIDDEN);
-                lv_obj_add_flag(label, LV_OBJ_FLAG_HIDDEN);
-            }
-        }
+        lv_obj_add_flag(symbol, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(label, LV_OBJ_FLAG_HIDDEN);
     }
 }
 
@@ -160,10 +131,6 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_dongle_battery_status, struct battery_state,
                             battery_status_update_cb, battery_status_get_state)
 
 ZMK_SUBSCRIPTION(widget_dongle_battery_status, zmk_peripheral_battery_state_changed);
-ZMK_SUBSCRIPTION(widget_dongle_battery_status, zmk_endpoint_changed);
-#if IS_ENABLED(CONFIG_ZMK_BLE)
-ZMK_SUBSCRIPTION(widget_dongle_battery_status, zmk_ble_active_profile_changed);
-#endif
 
 #if IS_ENABLED(CONFIG_ZMK_DONGLE_DISPLAY_DONGLE_BATTERY)
 #if !IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
