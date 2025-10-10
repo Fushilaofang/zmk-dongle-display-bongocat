@@ -81,6 +81,20 @@ static void set_battery_symbol(lv_obj_t *widget, struct battery_state state) {
     lv_obj_t *symbol = battery_objects[state.source].symbol;
     lv_obj_t *label = battery_objects[state.source].label;
 
+    /* 如果是外围设备(slot > 0)，并且设备未连接，则隐藏图标/标签（占位文本 "--"） */
+    if (state.source >= SOURCE_OFFSET) {
+        int peripheral_index = state.source - SOURCE_OFFSET;
+        bool peripheral_connected = zmk_ble_profile_is_connected(peripheral_index);
+        if (!peripheral_connected) {
+            /* 外围设备未连接：隐藏图标，显示 "NC" 占位文本 */
+            lv_label_set_text(label, "  NC");
+            lv_obj_add_flag(symbol, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(label, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_move_foreground(label);
+            return;
+        }
+    }
+
     if (state.level > 0 || state.usb_present) {
         draw_battery(symbol, state.level, state.usb_present);
         lv_label_set_text_fmt(label, "%4u%%", state.level);
