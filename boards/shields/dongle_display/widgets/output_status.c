@@ -28,20 +28,6 @@ LV_IMG_DECLARE(sym_bt);
 LV_IMG_DECLARE(sym_ok);
 LV_IMG_DECLARE(sym_nok);
 LV_IMG_DECLARE(sym_open);
-LV_IMG_DECLARE(sym_1);
-LV_IMG_DECLARE(sym_2);
-LV_IMG_DECLARE(sym_3);
-LV_IMG_DECLARE(sym_4);
-LV_IMG_DECLARE(sym_5);
-
-const lv_img_dsc_t *sym_num[] = {
-    &sym_1,
-    &sym_2,
-    &sym_3,
-    &sym_4,
-    &sym_5,
-};
-
 enum output_symbol {
     output_symbol_usb,
     output_symbol_usb_hid_status,
@@ -146,10 +132,10 @@ static void set_status_symbol(lv_obj_t *widget, struct output_status_state state
         lv_img_set_src(usb_hid_status, &sym_nok);
     }
 
-    if (state.active_profile_index < (sizeof(sym_num) / sizeof(lv_img_dsc_t *))) {
-        lv_img_set_src(bt_number, sym_num[state.active_profile_index]);
+    if (state.active_profile_index >= 0) {
+        lv_label_set_text_fmt(bt_number, "%d", state.active_profile_index + 1);
     } else {
-        lv_img_set_src(bt_number, &sym_nok);
+        lv_label_set_text(bt_number, "-");
     }
     
     if (state.active_profile_bonded) {
@@ -192,8 +178,10 @@ int zmk_widget_output_status_init(struct zmk_widget_output_status *widget, lv_ob
     lv_obj_align_to(bt, usb, LV_ALIGN_OUT_RIGHT_TOP, 6, 0);
     lv_img_set_src(bt, &sym_bt);
 
-    lv_obj_t *bt_number = lv_img_create(widget->obj);
-    lv_obj_align_to(bt_number, bt, LV_ALIGN_OUT_RIGHT_TOP, 2, 7);
+    lv_obj_t *bt_number = lv_label_create(widget->obj);
+    lv_label_set_text(bt_number, "1");
+    lv_label_set_long_mode(bt_number, LV_LABEL_LONG_CLIP);
+    lv_obj_align_to(bt_number, bt, LV_ALIGN_OUT_RIGHT_MID, 2, 0);
 
     lv_obj_t *bt_status = lv_img_create(widget->obj);
     lv_obj_align_to(bt_status, bt, LV_ALIGN_OUT_RIGHT_TOP, 2, 1);
