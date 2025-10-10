@@ -180,6 +180,8 @@ int zmk_widget_output_status_init(struct zmk_widget_output_status *widget, lv_ob
     widget->obj = lv_obj_create(parent);
 
     lv_obj_set_size(widget->obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_clear_flag(widget->obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_clip_corner(widget->obj, false, 0);
 
     lv_obj_t *usb = lv_img_create(widget->obj);
     lv_obj_align(usb, LV_ALIGN_TOP_LEFT, 1, 4);
@@ -193,7 +195,8 @@ int zmk_widget_output_status_init(struct zmk_widget_output_status *widget, lv_ob
     lv_img_set_src(bt, &sym_bt);
 
     lv_obj_t *bt_number = lv_img_create(widget->obj);
-    lv_obj_align_to(bt_number, bt, LV_ALIGN_OUT_RIGHT_TOP, 2, 5);
+    lv_obj_align_to(bt_number, bt, LV_ALIGN_OUT_RIGHT_TOP, 2, 7);
+    lv_obj_set_style_clip_corner(bt_number, false, 0);
 
     lv_obj_t *bt_status = lv_img_create(widget->obj);
     lv_obj_align_to(bt_status, bt, LV_ALIGN_OUT_RIGHT_TOP, 2, 1);
