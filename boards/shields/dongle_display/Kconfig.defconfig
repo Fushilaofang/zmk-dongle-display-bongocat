@@ -52,7 +52,7 @@ config LV_Z_VDB_SIZE
     default 64
 
 config LV_DPI_DEF
-    default 168
+    default 148
 
 config LV_Z_BITS_PER_PIXEL
     default 1
