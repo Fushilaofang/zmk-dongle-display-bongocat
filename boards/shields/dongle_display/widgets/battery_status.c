@@ -17,6 +17,11 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/events/usb_conn_state_changed.h>
 #include <zmk/event_manager.h>
 #include <zmk/usb.h>
+#include <stdint.h>
+#include <zmk/events/endpoint_changed.h>
+#if IS_ENABLED(CONFIG_ZMK_BLE)
+#include <zmk/events/ble_active_profile_changed.h>
+#endif
 
 #include "battery_status.h"
 
@@ -44,6 +49,9 @@ struct battery_object {
 } battery_objects[ZMK_SPLIT_BLE_PERIPHERAL_COUNT + SOURCE_OFFSET];
     
 static lv_color_t battery_image_buffer[ZMK_SPLIT_BLE_PERIPHERAL_COUNT + SOURCE_OFFSET][5 * 8];
+
+/* Cache of last-known battery levels per source. UINT8_MAX = unknown */
+static uint8_t last_levels[ZMK_SPLIT_BLE_PERIPHERAL_COUNT + SOURCE_OFFSET];
 
 static void draw_battery(lv_obj_t *canvas, uint8_t level, bool usb_present) {
     lv_canvas_fill_bg(canvas, lv_color_black(), LV_OPA_COVER);
@@ -81,20 +89,6 @@ static void set_battery_symbol(lv_obj_t *widget, struct battery_state state) {
     lv_obj_t *symbol = battery_objects[state.source].symbol;
     lv_obj_t *label = battery_objects[state.source].label;
 
-    /* 如果是外围设备(slot > 0)，并且设备未连接，则隐藏图标/标签（占位文本 "--"） */
-    if (state.source >= SOURCE_OFFSET) {
-        int peripheral_index = state.source - SOURCE_OFFSET;
-        bool peripheral_connected = zmk_ble_profile_is_connected(peripheral_index);
-        if (!peripheral_connected) {
-            /* 外围设备未连接：隐藏图标，显示 "NC" 占位文本 */
-            lv_label_set_text(label, "  NC");
-            lv_obj_add_flag(symbol, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_clear_flag(label, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_move_foreground(label);
-            return;
-        }
-    }
-
     if (state.level > 0 || state.usb_present) {
         draw_battery(symbol, state.level, state.usb_present);
         lv_label_set_text_fmt(label, "%4u%%", state.level);
@@ -103,8 +97,27 @@ static void set_battery_symbol(lv_obj_t *widget, struct battery_state state) {
         lv_obj_clear_flag(label, LV_OBJ_FLAG_HIDDEN);
         lv_obj_move_foreground(label);
     } else {
-        /* 无电量数据：隐藏图标，显示占位文本 "--" */
-        lv_label_set_text(label, "  --");
+        /* 无电量数据：根据外围设备连接状态显示占位文本或 NC */
+        if (state.source >= SOURCE_OFFSET) {
+            int per_idx = state.source - SOURCE_OFFSET;
+            bool connected = false;
+#if defined(CONFIG_ZMK_BLE)
+            if (per_idx >= 0 && per_idx < ZMK_SPLIT_BLE_PERIPHERAL_COUNT) {
+                connected = zmk_ble_profile_is_connected(per_idx);
+            }
+#endif
+            if (connected) {
+                /* 外围设备已连接但未上报电量 */
+                lv_label_set_text(label, "  --");
+            } else {
+                /* 外围设备未连接 */
+                lv_label_set_text(label, "  NC");
+            }
+        } else {
+            /* 中央/本机无电量上报，显示占位 */
+            lv_label_set_text(label, "  --");
+        }
+
         lv_obj_add_flag(symbol, LV_OBJ_FLAG_HIDDEN);
         lv_obj_clear_flag(label, LV_OBJ_FLAG_HIDDEN);
         lv_obj_move_foreground(label);
@@ -112,6 +125,11 @@ static void set_battery_symbol(lv_obj_t *widget, struct battery_state state) {
 }
 
 void battery_status_update_cb(struct battery_state state) {
+    /* Update cache for this source */
+    if (state.source < ZMK_SPLIT_BLE_PERIPHERAL_COUNT + SOURCE_OFFSET) {
+        last_levels[state.source] = state.level;
+    }
+
     struct zmk_widget_dongle_battery_status *widget;
     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_battery_symbol(widget->obj, state); }
 }
@@ -180,7 +198,10 @@ int zmk_widget_dongle_battery_status_init(struct zmk_widget_dongle_battery_statu
             .label = battery_label,
         };
     }
-
+    /* Initialize cache to unknown */
+    for (int i = 0; i < ZMK_SPLIT_BLE_PERIPHERAL_COUNT + SOURCE_OFFSET; i++) {
+        last_levels[i] = UINT8_MAX;
+    }
     sys_slist_append(&widgets, &widget->node);
 
     widget_dongle_battery_status_init();
@@ -191,3 +212,34 @@ int zmk_widget_dongle_battery_status_init(struct zmk_widget_dongle_battery_statu
 lv_obj_t *zmk_widget_dongle_battery_status_obj(struct zmk_widget_dongle_battery_status *widget) {
     return widget->obj;
 }
+
+/* Refresh listener: triggered when endpoints or BLE active profile change. We
+ * rebuild a battery_state for each source from cached values and refresh the
+ * UI so connected/disconnected state is reflected even if no battery event
+ * was emitted.
+ */
+struct battery_refresh_state {};
+
+static void battery_refresh_update_cb(struct battery_refresh_state _st) {
+    struct zmk_widget_dongle_battery_status *widget;
+
+    for (int src = 0; src < ZMK_SPLIT_BLE_PERIPHERAL_COUNT + SOURCE_OFFSET; src++) {
+        struct battery_state s = {
+            .source = src,
+            .level = (last_levels[src] == UINT8_MAX) ? 0 : last_levels[src],
+            .usb_present = (src == 0) ? zmk_usb_is_powered() : false,
+        };
+
+        SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_battery_symbol(widget->obj, s); }
+    }
+}
+
+static struct battery_refresh_state battery_refresh_get_state(const zmk_event_t *eh) { return (struct battery_refresh_state){}; }
+
+ZMK_DISPLAY_WIDGET_LISTENER(widget_dongle_battery_status_refresh, struct battery_refresh_state,
+                            battery_refresh_update_cb, battery_refresh_get_state)
+
+ZMK_SUBSCRIPTION(widget_dongle_battery_status_refresh, zmk_endpoint_changed);
+#if IS_ENABLED(CONFIG_ZMK_BLE)
+ZMK_SUBSCRIPTION(widget_dongle_battery_status_refresh, zmk_ble_active_profile_changed);
+#endif
