@@ -77,7 +77,6 @@ static void draw_wpm_canvas(struct zmk_widget_status *widget) {
     init_line_dsc(&line_dsc, LVGL_FOREGROUND, 1);
     line_dsc.round_start = 1;
     line_dsc.round_end = 1;
-    line_dsc.rounded = 1;
 
     char wpm_text[6] = {};
     snprintf(wpm_text, sizeof(wpm_text), "%d", state->wpm[9]);
