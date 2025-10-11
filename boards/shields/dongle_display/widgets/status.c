@@ -7,6 +7,7 @@
 
 #include <zephyr/kernel.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
@@ -28,6 +29,9 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/wpm.h>
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
+static int64_t last_status_update_ms = 0;
+static bool status_update_initialized;
+#define STATUS_UPDATE_INTERVAL_MS 250
 
 struct wpm_status_state {
     uint8_t wpm;
@@ -117,6 +121,13 @@ static void set_wpm_status(struct zmk_widget_status *widget, struct wpm_status_s
 }
 
 static void wpm_status_update_cb(struct wpm_status_state state) {
+    int64_t now = k_uptime_get();
+    if (status_update_initialized && now - last_status_update_ms < STATUS_UPDATE_INTERVAL_MS) {
+        return;
+    }
+    status_update_initialized = true;
+    last_status_update_ms = now;
+
     struct zmk_widget_status *widget;
     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_wpm_status(widget, state); }
 }
