@@ -11,7 +11,7 @@
 
 /* 仅保留 WPM 相关的配置和辅助函数 */
 #define CANVAS_SIZE_W 68
-#define CANVAS_SIZE_H 42
+#define CANVAS_SIZE_H 68
 
 #define LVGL_BACKGROUND                                                                            \
     IS_ENABLED(CONFIG_NICE_VIEW_WIDGET_INVERTED) ? lv_color_black() : lv_color_white()

@@ -44,53 +44,16 @@ static void draw_wpm_canvas(lv_obj_t *canvas_obj, const struct status_state *sta
     lv_draw_line_dsc_t line_dsc;
     init_line_dsc(&line_dsc, LVGL_FOREGROUND, 1);
 
-    const int border = 1;
-    const int graph_margin = 2;
-    const int box_height = CANVAS_SIZE_H / 2;
-    const int box_top = CANVAS_SIZE_H - box_height;
-    int graph_bottom = box_top - border - 1;
-    int graph_top = graph_margin;
-
-    if (graph_bottom <= graph_top) {
-        graph_bottom = CANVAS_SIZE_H - border - 1;
-        graph_top = graph_margin;
-    }
-
-    int graph_height = graph_bottom - graph_top;
-    if (graph_height < 1) {
-        graph_height = 1;
-    }
-
     /* Fill background */
     lv_canvas_draw_rect(canvas, 0, 0, CANVAS_SIZE_W, CANVAS_SIZE_H, &rect_black_dsc);
 
-    /* Draw graph background */
-    lv_canvas_draw_rect(canvas, border, graph_top - border, CANVAS_SIZE_W - 2 * border,
-                        graph_bottom - graph_top + 2 * border, &rect_white_dsc);
-    lv_canvas_draw_rect(canvas, border + 1, graph_top, CANVAS_SIZE_W - 2 * (border + 1),
-                        graph_bottom - graph_top, &rect_black_dsc);
-
     /* Draw WPM box and value */
-    lv_canvas_draw_rect(canvas, 0, box_top, CANVAS_SIZE_W, box_height, &rect_white_dsc);
-    lv_canvas_draw_rect(canvas, border, box_top + border, CANVAS_SIZE_W - 2 * border,
-                        box_height - 2 * border, &rect_black_dsc);
+    lv_canvas_draw_rect(canvas, 0, 21, 68, 42, &rect_white_dsc);
+    lv_canvas_draw_rect(canvas, 1, 22, 66, 40, &rect_black_dsc);
 
     char wpm_text[6] = {};
     snprintf(wpm_text, sizeof(wpm_text), "%d", state->wpm[9]);
-
-    int text_width = CANVAS_SIZE_W - 2 * border - 4;
-    if (text_width < 0) {
-        text_width = CANVAS_SIZE_W;
-    }
-
-    int text_height = lv_font_get_line_height(label_dsc_wpm.font);
-    int text_y = box_top + (box_height - text_height) / 2;
-    if (text_y < box_top) {
-        text_y = box_top;
-    }
-
-    lv_canvas_draw_text(canvas, CANVAS_SIZE_W - border - 2, text_y, text_width, &label_dsc_wpm,
-                        wpm_text);
+    lv_canvas_draw_text(canvas, 42, 52, 24, &label_dsc_wpm, wpm_text);
 
     int max = 0;
     int min = 256;
@@ -109,21 +72,13 @@ static void draw_wpm_canvas(lv_obj_t *canvas_obj, const struct status_state *sta
         range = 1;
     }
 
-    int graph_width = CANVAS_SIZE_W - 2 * graph_margin;
-    if (graph_width < 1) {
-        graph_width = 1;
-    }
-    int step_x = graph_width / 9;
-    if (step_x < 1) {
-        step_x = 1;
-    }
-
     lv_point_t points[10];
     for (int i = 0; i < 10; i++) {
-        points[i].x = graph_margin + i * step_x;
-        points[i].y = graph_bottom - (state->wpm[i] - min) * graph_height / range;
+        points[i].x = 2 + i * 7;
+        points[i].y = 60 - (state->wpm[i] - min) * 36 / range;
     }
     lv_canvas_draw_line(canvas, points, 10, &line_dsc);
+
 }
 
 static void set_wpm_status(struct zmk_widget_status *widget, struct wpm_status_state state) {
