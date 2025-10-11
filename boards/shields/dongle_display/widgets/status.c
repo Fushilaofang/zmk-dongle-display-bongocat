@@ -7,7 +7,6 @@
 
 #include <zephyr/kernel.h>
 #include <string.h>
-#include <stdbool.h>
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
@@ -29,9 +28,6 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/wpm.h>
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
-static int64_t last_status_update_ms = 0;
-static bool status_update_initialized;
-#define STATUS_UPDATE_INTERVAL_MS 250
 
 struct wpm_status_state {
     uint8_t wpm;
@@ -77,6 +73,7 @@ static void draw_wpm_canvas(struct zmk_widget_status *widget) {
     init_line_dsc(&line_dsc, LVGL_FOREGROUND, 1);
     line_dsc.round_start = 1;
     line_dsc.round_end = 1;
+    line_dsc.rounded = 1;
 
     char wpm_text[6] = {};
     snprintf(wpm_text, sizeof(wpm_text), "%d", state->wpm[9]);
@@ -111,22 +108,21 @@ static void draw_wpm_canvas(struct zmk_widget_status *widget) {
 }
 
 static void set_wpm_status(struct zmk_widget_status *widget, struct wpm_status_state state) {
+    const int64_t now = k_uptime_get();
+    if (now - widget->last_update_ms < 200) {
+        return;
+    }
+
     for (int i = 0; i < 9; i++) {
         widget->state.wpm[i] = widget->state.wpm[i + 1];
     }
     widget->state.wpm[9] = state.wpm;
 
     draw_wpm_canvas(widget);
+    widget->last_update_ms = now;
 }
 
 static void wpm_status_update_cb(struct wpm_status_state state) {
-    int64_t now = k_uptime_get();
-    if (status_update_initialized && now - last_status_update_ms < STATUS_UPDATE_INTERVAL_MS) {
-        return;
-    }
-    status_update_initialized = true;
-    last_status_update_ms = now;
-
     struct zmk_widget_status *widget;
     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_wpm_status(widget, state); }
 }
@@ -146,6 +142,7 @@ int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
 
     draw_wpm_background(widget);
     draw_wpm_canvas(widget);
+    widget->last_update_ms = k_uptime_get();
 
     sys_slist_append(&widgets, &widget->node);
     widget_wpm_status_init();

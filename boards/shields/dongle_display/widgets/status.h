@@ -18,6 +18,7 @@ struct zmk_widget_status {
     lv_color_t cbuf[CANVAS_SIZE_W * CANVAS_SIZE_H];
     lv_color_t bg_cbuf[CANVAS_SIZE_W * CANVAS_SIZE_H];
     struct status_state state;
+    int64_t last_update_ms;
 };
 
 int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent);
