@@ -16,6 +16,7 @@ struct zmk_widget_status {
     lv_obj_t *obj;
     /* 仅保留一个画布缓冲区用于 WPM 显示 */
     lv_color_t cbuf[CANVAS_SIZE_W * CANVAS_SIZE_H];
+    lv_color_t bg_cbuf[CANVAS_SIZE_W * CANVAS_SIZE_H];
     struct status_state state;
 };
 
