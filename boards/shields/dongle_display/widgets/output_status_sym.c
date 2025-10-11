@@ -228,4 +228,3 @@ const lv_img_dsc_t sym_usb = {
 };
 
 
-
