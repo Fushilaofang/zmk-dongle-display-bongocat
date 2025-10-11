@@ -73,6 +73,7 @@ static void draw_wpm_canvas(struct zmk_widget_status *widget) {
     init_line_dsc(&line_dsc, LVGL_FOREGROUND, 1);
     line_dsc.round_start = 1;
     line_dsc.round_end = 1;
+    line_dsc.rounded = 1;
 
     char wpm_text[6] = {};
     snprintf(wpm_text, sizeof(wpm_text), "%d", state->wpm[9]);
@@ -107,18 +108,12 @@ static void draw_wpm_canvas(struct zmk_widget_status *widget) {
 }
 
 static void set_wpm_status(struct zmk_widget_status *widget, struct wpm_status_state state) {
-    const int64_t now = k_uptime_get();
-    if (now - widget->last_update_ms < 200) {
-        return;
-    }
-
     for (int i = 0; i < 9; i++) {
         widget->state.wpm[i] = widget->state.wpm[i + 1];
     }
     widget->state.wpm[9] = state.wpm;
 
     draw_wpm_canvas(widget);
-    widget->last_update_ms = now;
 }
 
 static void wpm_status_update_cb(struct wpm_status_state state) {
@@ -141,7 +136,6 @@ int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
 
     draw_wpm_background(widget);
     draw_wpm_canvas(widget);
-    widget->last_update_ms = k_uptime_get();
 
     sys_slist_append(&widgets, &widget->node);
     widget_wpm_status_init();
