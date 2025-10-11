@@ -45,7 +45,7 @@ static void draw_wpm_canvas(lv_obj_t *canvas_obj, const struct status_state *sta
     init_line_dsc(&line_dsc, LVGL_FOREGROUND, 1);
 
     /* Fill background */
-    lv_canvas_draw_rect(canvas, 0, 0, CANVAS_SIZE, CANVAS_SIZE, &rect_black_dsc);
+    lv_canvas_draw_rect(canvas, 0, 0, CANVAS_SIZE_W, CANVAS_SIZE_H, &rect_black_dsc);
 
     /* Draw WPM box and value */
     lv_canvas_draw_rect(canvas, 0, 21, 68, 42, &rect_white_dsc);
@@ -105,8 +105,8 @@ ZMK_SUBSCRIPTION(widget_wpm_status, zmk_wpm_state_changed);
 
 int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
     widget->obj = lv_canvas_create(parent);
-    lv_obj_set_size(widget->obj, CANVAS_SIZE, CANVAS_SIZE);
-    lv_canvas_set_buffer(widget->obj, widget->cbuf, CANVAS_SIZE, CANVAS_SIZE, LV_IMG_CF_TRUE_COLOR);
+    lv_obj_set_size(widget->obj, CANVAS_SIZE_W, CANVAS_SIZE_H);
+    lv_canvas_set_buffer(widget->obj, widget->cbuf, CANVAS_SIZE_W, CANVAS_SIZE_H, LV_IMG_CF_TRUE_COLOR);
 
     sys_slist_append(&widgets, &widget->node);
     widget_wpm_status_init();
