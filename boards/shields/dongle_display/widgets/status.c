@@ -69,8 +69,6 @@ static void draw_wpm_canvas(struct zmk_widget_status *widget) {
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
 
-    lv_draw_label_dsc_t label_dsc_wpm;
-    init_label_dsc(&label_dsc_wpm, LVGL_FOREGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_RIGHT);
     lv_draw_line_dsc_t line_dsc;
     init_line_dsc(&line_dsc, LVGL_FOREGROUND, 1);
 
@@ -79,7 +77,13 @@ static void draw_wpm_canvas(struct zmk_widget_status *widget) {
     
     lv_area_t text_area;
     lv_area_set(&text_area, 42, 52, 65, 60);
-    lv_draw_label(&layer, &label_dsc_wpm, &text_area, wpm_text, NULL);
+    lv_draw_label_dsc_t label_dsc;
+    lv_draw_label_dsc_init(&label_dsc);
+    label_dsc.color = LVGL_FOREGROUND;
+    label_dsc.font = &lv_font_unscii_8;
+    label_dsc.align = LV_TEXT_ALIGN_RIGHT;
+    label_dsc.text = wpm_text;
+    lv_draw_label(&layer, &label_dsc, &text_area);
 
     int max = 0;
     int min = 256;
