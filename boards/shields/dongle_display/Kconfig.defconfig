@@ -18,6 +18,30 @@ config ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
     select ZMK_WPM
     imply ZMK_HID_INDICATORS
 
+config DISPLAY
+	default y
+
+config ST730X
+	default y
+
+config ST730X_CONV_BUFFER_LINE_CNT
+	default 16
+	help
+	  转换缓冲区大小(行数)。值越大,写入速度越快,但占用更多内存。
+
+# 根据需要选择功耗模式
+# config ST730X_POWERMODE_LOW
+# 	default y
+# 	help
+# 	  启用低功耗模式,降低刷新率以节省电量。
+# 	  如果需要更高的刷新率,请注释掉此选项。
+
+config SPI
+	default y
+
+config MIPI_DBI
+	default y
+
 config ZMK_DONGLE_DISPLAY_DONGLE_BATTERY
     bool "Show also the battery level of the dongle"
     depends on BT && (!ZMK_SPLIT_BLE || ZMK_SPLIT_ROLE_CENTRAL)
@@ -50,6 +74,9 @@ config LV_Z_MEM_POOL_SIZE
 
 config LV_Z_VDB_SIZE
     default 64
+
+config LV_Z_DOUBLE_VDB
+	default n
 
 config LV_DPI_DEF
     default 148

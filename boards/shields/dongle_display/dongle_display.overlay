@@ -4,19 +4,36 @@
  * SPDX-License-Identifier: MIT
  */
 
- &ls0xx_ls013b7dh03_spi {
+ &ydp154h008_v3_spi {
     status = "okay";
-    ls0xx_ls013b7dh03: ls0xx@0 {
-        compatible = "sharp,ls0xx";
-        spi-max-frequency = <2000000>;
+    ydp154h008_v3: ydp154h008_v3@0 {
+        compatible = "sitronix,st7305";
+        spi-max-frequency = <8000000>;
         reg = <0>;
-        width = <128>;
-        height = <128>;
+        width = <200>;
+        height = <200>;
+        start-line = <0>;
+        start-column = <0>;
+        nvm-load = [00 00];
+        gate-voltages = [1F 1F];
+        vsh = [14 14 14 14];
+        vsl = [14 14 14 14];
+        vshn = [14 14 14 14];
+        vsln = [14 14 14 14];
+        osc-settings = <0x80>;
+        framerate = <0x10>;
+        multiplex-ratio = <50>;
+        source-voltage = <0>;
+        remap-value = <0x00>;
+        panel-settings = <0x00>;
+        hpm-gate-waveform = [0xE5, 0xF6, 0x05, 0x46, 0x77, 0x77, 0x77, 0x77, 0x76, 0x45];
+        lpm-gate-waveform = [0x05, 0x46, 0x77, 0x77, 0x77, 0x77, 0x76, 0x45];
+        inversion-on;
     };
 };
 
 / {
     chosen {
-        zephyr,display = &ls0xx_ls013b7dh03;
+        zephyr,display = &ydp154h008_v3;
     };
 };
