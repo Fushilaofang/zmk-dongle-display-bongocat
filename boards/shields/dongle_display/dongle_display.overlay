@@ -26,8 +26,8 @@
         source-voltage = <0>;
         remap-value = <0x00>;
         panel-settings = <0x00>;
-        hpm-gate-waveform = [0xE5, 0xF6, 0x05, 0x46, 0x77, 0x77, 0x77, 0x77, 0x76, 0x45];
-        lpm-gate-waveform = [0x05, 0x46, 0x77, 0x77, 0x77, 0x77, 0x76, 0x45];
+        hpm-gate-waveform = [E5 F6 05 46 77 77 77 77 76 45];
+        lpm-gate-waveform = [05 46 77 77 77 77 76 45];
         inversion-on;
     };
 };
