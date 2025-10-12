@@ -23,11 +23,12 @@ config DISPLAY
 
 config ST730X
 	default y
+	depends on DT_HAS_SITRONIX_ST7305_ENABLED || DT_HAS_SITRONIX_ST7306_ENABLED
+	select MIPI_DBI
 
 config ST730X_CONV_BUFFER_LINE_CNT
 	default 16
 	help
-	  转换缓冲区大小(行数)。值越大,写入速度越快,但占用更多内存。
 
 # 根据需要选择功耗模式
 # config ST730X_POWERMODE_LOW
@@ -37,9 +38,6 @@ config ST730X_CONV_BUFFER_LINE_CNT
 # 	  如果需要更高的刷新率,请注释掉此选项。
 
 config SPI
-	default y
-
-config MIPI_DBI
 	default y
 
 config ZMK_DONGLE_DISPLAY_DONGLE_BATTERY
