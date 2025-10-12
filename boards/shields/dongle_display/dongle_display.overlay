@@ -4,3 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
+/ {
+    chosen {
+        zephyr,display = &ydp154h008_v3;
+    };
+};
