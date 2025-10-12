@@ -37,11 +37,11 @@ config ST730X_CONV_BUFFER_LINE_CNT
 	  Size of the conversion buffer in lines.
 
 # 根据需要选择功耗模式
-# config ST730X_POWERMODE_LOW
-#   bool "Use low power mode"
-# 	default y
-# 	help
-# 	  Enable this to use lower framerate LPM (Low Power Mode).
+config ST730X_POWERMODE_LOW
+    bool "Use low power mode"
+  	default n
+  	help
+  	  Enable this to use lower framerate LPM (Low Power Mode).
 
 config SPI
 	default y
