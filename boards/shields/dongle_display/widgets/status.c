@@ -107,7 +107,12 @@ static void draw_wpm_canvas(struct zmk_widget_status *widget) {
         points[i].x = 2 + i * 7;
         points[i].y = 60 - (state->wpm[i] - min) * 36 / range;
     }
-    lv_draw_line(&layer, &line_dsc, points, 10);
+    
+    // Draw polyline in LVGL v9
+    for (int i = 0; i < 9; i++) {
+        lv_point_precise_t line_points[2] = { points[i], points[i + 1] };
+        lv_draw_line(&layer, &line_dsc, line_points);
+    }
     
     lv_canvas_finish_layer(canvas, &layer);
 }
