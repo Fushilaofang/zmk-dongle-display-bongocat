@@ -84,34 +84,34 @@ enum anim_state {
 static void set_animation(lv_obj_t *animing, struct bongo_cat_wpm_status_state state) {
     if (state.wpm < 5) {
         if (current_anim_state != anim_state_idle) {
-            lv_animimg_set_src(animing, SRC(idle_imgs));
-            lv_animimg_set_duration(animing, ANIMATION_SPEED_IDLE);
-            lv_animimg_set_repeat_count(animing, LV_ANIM_REPEAT_INFINITE);
-            lv_animimg_start(animing);
+            lv_image_set_src(animing, SRC(idle_imgs));
+            lv_image_set_duration(animing, ANIMATION_SPEED_IDLE);
+            lv_image_set_repeat_count(animing, LV_ANIM_REPEAT_INFINITE);
+            lv_image_start(animing);
             current_anim_state = anim_state_idle;
         }
     } else if (state.wpm < 30) {
         if (current_anim_state != anim_state_slow) {
-            lv_animimg_set_src(animing, SRC(slow_imgs));
-            lv_animimg_set_duration(animing, ANIMATION_SPEED_SLOW);
-            lv_animimg_set_repeat_count(animing, LV_ANIM_REPEAT_INFINITE);
-            lv_animimg_start(animing);
+            lv_image_set_src(animing, SRC(slow_imgs));
+            lv_image_set_duration(animing, ANIMATION_SPEED_SLOW);
+            lv_image_set_repeat_count(animing, LV_ANIM_REPEAT_INFINITE);
+            lv_image_start(animing);
             current_anim_state = anim_state_slow;
         }
     } else if (state.wpm < 70) {
         if (current_anim_state != anim_state_mid) {
-            lv_animimg_set_src(animing, SRC(mid_imgs));
-            lv_animimg_set_duration(animing, ANIMATION_SPEED_MID);
-            lv_animimg_set_repeat_count(animing, LV_ANIM_REPEAT_INFINITE);
-            lv_animimg_start(animing);
+            lv_image_set_src(animing, SRC(mid_imgs));
+            lv_image_set_duration(animing, ANIMATION_SPEED_MID);
+            lv_image_set_repeat_count(animing, LV_ANIM_REPEAT_INFINITE);
+            lv_image_start(animing);
             current_anim_state = anim_state_mid;
         }
     } else {
         if (current_anim_state != anim_state_fast) {
-            lv_animimg_set_src(animing, SRC(fast_imgs));
-            lv_animimg_set_duration(animing, ANIMATION_SPEED_FAST);
-            lv_animimg_set_repeat_count(animing, LV_ANIM_REPEAT_INFINITE);
-            lv_animimg_start(animing);
+            lv_image_set_src(animing, SRC(fast_imgs));
+            lv_image_set_duration(animing, ANIMATION_SPEED_FAST);
+            lv_image_set_repeat_count(animing, LV_ANIM_REPEAT_INFINITE);
+            lv_image_start(animing);
             current_anim_state = anim_state_fast;
         }
     }
@@ -133,7 +133,7 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_bongo_cat, struct bongo_cat_wpm_status_state,
 ZMK_SUBSCRIPTION(widget_bongo_cat, zmk_wpm_state_changed);
 
 int zmk_widget_bongo_cat_init(struct zmk_widget_bongo_cat *widget, lv_obj_t *parent) {
-    widget->obj = lv_animimg_create(parent);
+    widget->obj = lv_image_create(parent);
     lv_obj_center(widget->obj);
 
     sys_slist_append(&widgets, &widget->node);
