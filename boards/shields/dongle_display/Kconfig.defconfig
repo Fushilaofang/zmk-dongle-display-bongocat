@@ -22,20 +22,26 @@ config DISPLAY
 	default y
 
 config ST730X
+	bool "ST730x display controllers driver"
 	default y
 	depends on DT_HAS_SITRONIX_ST7305_ENABLED || DT_HAS_SITRONIX_ST7306_ENABLED
 	select MIPI_DBI
+	help
+	  Enable driver for ST730X series display controllers.
 
 config ST730X_CONV_BUFFER_LINE_CNT
-	default 16
+	int "Size of the conversion buffer in lines"
+	default 8
+	range 1 1024
 	help
+	  Size of the conversion buffer in lines.
 
 # 根据需要选择功耗模式
 # config ST730X_POWERMODE_LOW
+#   bool "Use low power mode"
 # 	default y
 # 	help
-# 	  启用低功耗模式,降低刷新率以节省电量。
-# 	  如果需要更高的刷新率,请注释掉此选项。
+# 	  Enable this to use lower framerate LPM (Low Power Mode).
 
 config SPI
 	default y
