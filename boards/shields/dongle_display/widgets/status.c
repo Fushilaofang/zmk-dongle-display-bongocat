@@ -116,7 +116,7 @@ ZMK_SUBSCRIPTION(widget_wpm_status, zmk_wpm_state_changed);
 int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
     widget->obj = lv_canvas_create(parent);
     lv_obj_set_size(widget->obj, CANVAS_SIZE_W, CANVAS_SIZE_H);
-    lv_canvas_set_buffer(widget->obj, widget->cbuf, CANVAS_SIZE_W, CANVAS_SIZE_H, LV_IMG_CF_TRUE_COLOR);
+    lv_canvas_set_buffer(widget->obj, widget->cbuf, CANVAS_SIZE_W, CANVAS_SIZE_H, LV_COLOR_FORMAT_NATIVE);
 
     draw_wpm_background(widget);
     draw_wpm_canvas(widget);
