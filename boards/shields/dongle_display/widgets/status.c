@@ -36,10 +36,7 @@ struct wpm_status_state {
 static void draw_wpm_background(struct zmk_widget_status *widget) {
     lv_obj_t *canvas = widget->obj;
 
-    lv_canvas_set_buffer(canvas, widget->bg_cbuf, CANVAS_SIZE_W, CANVAS_SIZE_H, LV_COLOR_FORMAT_NATIVE);
-
-    lv_layer_t layer;
-    lv_canvas_init_layer(canvas, &layer);
+    lv_canvas_set_buffer(canvas, widget->bg_cbuf, CANVAS_SIZE_W, CANVAS_SIZE_H, LV_IMG_CF_TRUE_COLOR);
 
     lv_draw_rect_dsc_t rect_bg_dsc;
     init_rect_dsc(&rect_bg_dsc, LVGL_BACKGROUND);
@@ -47,16 +44,10 @@ static void draw_wpm_background(struct zmk_widget_status *widget) {
     init_rect_dsc(&rect_border_dsc, LVGL_FOREGROUND);
 
     lv_canvas_fill_bg(canvas, LVGL_BACKGROUND, LV_OPA_COVER);
-    
-    lv_area_t rect_area;
-    lv_area_set(&rect_area, 0, 21, 67, 62);
-    lv_draw_rect(&layer, &rect_border_dsc, &rect_area);
-    lv_area_set(&rect_area, 1, 22, 66, 61);
-    lv_draw_rect(&layer, &rect_bg_dsc, &rect_area);
+    lv_canvas_draw_rect(canvas, 0, 21, 68, 42, &rect_border_dsc);
+    lv_canvas_draw_rect(canvas, 1, 22, 66, 40, &rect_bg_dsc);
 
-    lv_canvas_finish_layer(canvas, &layer);
-
-    lv_canvas_set_buffer(canvas, widget->cbuf, CANVAS_SIZE_W, CANVAS_SIZE_H, LV_COLOR_FORMAT_NATIVE);
+    lv_canvas_set_buffer(canvas, widget->cbuf, CANVAS_SIZE_W, CANVAS_SIZE_H, LV_IMG_CF_TRUE_COLOR);
     memcpy(widget->cbuf, widget->bg_cbuf, sizeof(widget->cbuf));
 }
 
@@ -66,24 +57,14 @@ static void draw_wpm_canvas(struct zmk_widget_status *widget) {
 
     memcpy(widget->cbuf, widget->bg_cbuf, sizeof(widget->cbuf));
 
-    lv_layer_t layer;
-    lv_canvas_init_layer(canvas, &layer);
-
+    lv_draw_label_dsc_t label_dsc_wpm;
+    init_label_dsc(&label_dsc_wpm, LVGL_FOREGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_RIGHT);
     lv_draw_line_dsc_t line_dsc;
     init_line_dsc(&line_dsc, LVGL_FOREGROUND, 1);
 
     char wpm_text[6] = {};
     snprintf(wpm_text, sizeof(wpm_text), "%d", state->wpm[9]);
-    
-    lv_area_t text_area;
-    lv_area_set(&text_area, 42, 52, 65, 60);
-    lv_draw_label_dsc_t label_dsc;
-    lv_draw_label_dsc_init(&label_dsc);
-    label_dsc.color = LVGL_FOREGROUND;
-    label_dsc.font = &lv_font_unscii_8;
-    label_dsc.align = LV_TEXT_ALIGN_RIGHT;
-    label_dsc.text = wpm_text;
-    lv_draw_label(&layer, &label_dsc, &text_area);
+    lv_canvas_draw_text(canvas, 42, 52, 24, &label_dsc_wpm, wpm_text);
 
     int max = 0;
     int min = 256;
@@ -102,19 +83,12 @@ static void draw_wpm_canvas(struct zmk_widget_status *widget) {
         range = 1;
     }
 
-    lv_point_precise_t points[10];
+    lv_point_t points[10];
     for (int i = 0; i < 10; i++) {
         points[i].x = 2 + i * 7;
         points[i].y = 60 - (state->wpm[i] - min) * 36 / range;
     }
-    
-    // Draw polyline in LVGL v9
-    for (int i = 0; i < 9; i++) {
-        lv_point_precise_t line_points[2] = { points[i], points[i + 1] };
-        lv_draw_line(&layer, &line_dsc, line_points);
-    }
-    
-    lv_canvas_finish_layer(canvas, &layer);
+    lv_canvas_draw_line(canvas, points, 10, &line_dsc);
 }
 
 static void set_wpm_status(struct zmk_widget_status *widget, struct wpm_status_state state) {
@@ -142,7 +116,7 @@ ZMK_SUBSCRIPTION(widget_wpm_status, zmk_wpm_state_changed);
 int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
     widget->obj = lv_canvas_create(parent);
     lv_obj_set_size(widget->obj, CANVAS_SIZE_W, CANVAS_SIZE_H);
-    lv_canvas_set_buffer(widget->obj, widget->cbuf, CANVAS_SIZE_W, CANVAS_SIZE_H, LV_COLOR_FORMAT_NATIVE);
+    lv_canvas_set_buffer(widget->obj, widget->cbuf, CANVAS_SIZE_W, CANVAS_SIZE_H, LV_IMG_CF_TRUE_COLOR);
 
     draw_wpm_background(widget);
     draw_wpm_canvas(widget);
