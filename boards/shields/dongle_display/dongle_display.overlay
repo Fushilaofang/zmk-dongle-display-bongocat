@@ -3,6 +3,6 @@
  *
  * SPDX-License-Identifier: MIT
  */
-#include <zephyr/dt-bindings/mipi_dbi/mipi_dbi.h>
+
 
 
