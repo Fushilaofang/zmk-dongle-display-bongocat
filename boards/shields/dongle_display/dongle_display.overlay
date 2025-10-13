@@ -5,8 +5,4 @@
  */
 #include <zephyr/dt-bindings/mipi_dbi/mipi_dbi.h>
 
-/ {
-    chosen {
-        zephyr,display = &st7305;
-    };
-};
+
