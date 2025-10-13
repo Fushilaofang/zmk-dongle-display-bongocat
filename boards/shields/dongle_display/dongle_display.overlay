@@ -7,6 +7,6 @@
 
 / {
     chosen {
-        zephyr,display = &st7305_ydp154h008_v3;
+        zephyr,display = &st7305;
     };
 };
