@@ -36,7 +36,7 @@ struct wpm_status_state {
 static void draw_wpm_background(struct zmk_widget_status *widget) {
     lv_obj_t *canvas = widget->obj;
 
-    lv_canvas_set_buffer(canvas, widget->bg_cbuf, CANVAS_SIZE_W, CANVAS_SIZE_H, LV_IMG_CF_TRUE_COLOR);
+    lv_canvas_set_buffer(canvas, widget->bg_cbuf, CANVAS_SIZE, CANVAS_SIZE, CANVAS_COLOR_FORMAT);
 
     lv_draw_rect_dsc_t rect_bg_dsc;
     init_rect_dsc(&rect_bg_dsc, LVGL_BACKGROUND);
@@ -44,10 +44,10 @@ static void draw_wpm_background(struct zmk_widget_status *widget) {
     init_rect_dsc(&rect_border_dsc, LVGL_FOREGROUND);
 
     lv_canvas_fill_bg(canvas, LVGL_BACKGROUND, LV_OPA_COVER);
-    lv_canvas_draw_rect(canvas, 0, 21, 68, 42, &rect_border_dsc);
-    lv_canvas_draw_rect(canvas, 1, 22, 66, 40, &rect_bg_dsc);
+    canvas_draw_rect(canvas, 0, 21, 68, 42, &rect_border_dsc);
+    canvas_draw_rect(canvas, 1, 22, 66, 40, &rect_bg_dsc);
 
-    lv_canvas_set_buffer(canvas, widget->cbuf, CANVAS_SIZE_W, CANVAS_SIZE_H, LV_IMG_CF_TRUE_COLOR);
+    lv_canvas_set_buffer(canvas, widget->cbuf, CANVAS_SIZE, CANVAS_SIZE, CANVAS_COLOR_FORMAT);
     memcpy(widget->cbuf, widget->bg_cbuf, sizeof(widget->cbuf));
 }
 
@@ -64,7 +64,7 @@ static void draw_wpm_canvas(struct zmk_widget_status *widget) {
 
     char wpm_text[6] = {};
     snprintf(wpm_text, sizeof(wpm_text), "%d", state->wpm[9]);
-    lv_canvas_draw_text(canvas, 42, 52, 24, &label_dsc_wpm, wpm_text);
+    canvas_draw_text(canvas, 42, 52, 24, &label_dsc_wpm, wpm_text);
 
     int max = 0;
     int min = 256;
@@ -88,7 +88,7 @@ static void draw_wpm_canvas(struct zmk_widget_status *widget) {
         points[i].x = 2 + i * 7;
         points[i].y = 60 - (state->wpm[i] - min) * 36 / range;
     }
-    lv_canvas_draw_line(canvas, points, 10, &line_dsc);
+    canvas_draw_line(canvas, points, 10, &line_dsc);
 }
 
 static void set_wpm_status(struct zmk_widget_status *widget, struct wpm_status_state state) {
@@ -115,8 +115,8 @@ ZMK_SUBSCRIPTION(widget_wpm_status, zmk_wpm_state_changed);
 
 int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
     widget->obj = lv_canvas_create(parent);
-    lv_obj_set_size(widget->obj, CANVAS_SIZE_W, CANVAS_SIZE_H);
-    lv_canvas_set_buffer(widget->obj, widget->cbuf, CANVAS_SIZE_W, CANVAS_SIZE_H, LV_IMG_CF_TRUE_COLOR);
+    lv_obj_set_size(widget->obj, CANVAS_SIZE, CANVAS_SIZE);
+    lv_canvas_set_buffer(widget->obj, widget->cbuf, CANVAS_SIZE, CANVAS_SIZE, CANVAS_COLOR_FORMAT);
 
     draw_wpm_background(widget);
     draw_wpm_canvas(widget);

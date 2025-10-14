@@ -24,7 +24,7 @@ struct modifiers_state {
 
 struct modifier_symbol {    
     uint8_t modifier;
-    const lv_img_dsc_t *symbol_dsc;
+    const lv_image_dsc_t *symbol_dsc;
     lv_obj_t *symbol;
     lv_obj_t *selection_line; 
     bool is_active;

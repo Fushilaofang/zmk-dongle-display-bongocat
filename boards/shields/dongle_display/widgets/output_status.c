@@ -33,7 +33,7 @@ LV_IMG_DECLARE(sym_3);
 LV_IMG_DECLARE(sym_4);
 LV_IMG_DECLARE(sym_5);
 
-const lv_img_dsc_t *sym_num[] = {
+const lv_image_dsc_t *sym_num[] = {
     &sym_1,
     &sym_2,
     &sym_3,
@@ -136,7 +136,7 @@ static void set_status_symbol(lv_obj_t *widget, struct output_status_state state
         lv_img_set_src(usb_hid_status, &sym_nok);
     }
 
-    if (state.active_profile_index < (sizeof(sym_num) / sizeof(lv_img_dsc_t *))) {
+    if (state.active_profile_index < (sizeof(sym_num) / sizeof(lv_image_dsc_t *))) {
         lv_img_set_src(bt_number, sym_num[state.active_profile_index]);
     } else {
         lv_img_set_src(bt_number, &sym_nok);
