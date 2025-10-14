@@ -34,39 +34,61 @@ struct wpm_status_state {
 };
 
 static void draw_wpm_background(struct zmk_widget_status *widget) {
-    lv_obj_t *container = widget->obj;
+    lv_obj_t *canvas = widget->obj;
 
-    // Create the chart background area
-    if (!widget->chart_bg) {
-        widget->chart_bg = lv_obj_create(container);
-        lv_obj_set_size(widget->chart_bg, 68, 42);
-        lv_obj_set_pos(widget->chart_bg, 0, 21);
-        lv_obj_set_style_bg_color(widget->chart_bg, LVGL_BACKGROUND, 0);
-        lv_obj_set_style_border_color(widget->chart_bg, LVGL_FOREGROUND, 0);
-        lv_obj_set_style_border_width(widget->chart_bg, 1, 0);
-        lv_obj_clear_flag(widget->chart_bg, LV_OBJ_FLAG_SCROLLABLE);
-    }
+    lv_canvas_set_buffer(canvas, widget->bg_cbuf, CANVAS_SIZE_W, CANVAS_SIZE_H, LV_IMG_CF_TRUE_COLOR);
+
+    lv_draw_rect_dsc_t rect_bg_dsc;
+    init_rect_dsc(&rect_bg_dsc, LVGL_BACKGROUND);
+    lv_draw_rect_dsc_t rect_border_dsc;
+    init_rect_dsc(&rect_border_dsc, LVGL_FOREGROUND);
+
+    lv_canvas_fill_bg(canvas, LVGL_BACKGROUND, LV_OPA_COVER);
+    lv_canvas_draw_rect(canvas, 0, 21, 68, 42, &rect_border_dsc);
+    lv_canvas_draw_rect(canvas, 1, 22, 66, 40, &rect_bg_dsc);
+
+    lv_canvas_set_buffer(canvas, widget->cbuf, CANVAS_SIZE_W, CANVAS_SIZE_H, LV_IMG_CF_TRUE_COLOR);
+    memcpy(widget->cbuf, widget->bg_cbuf, sizeof(widget->cbuf));
 }
 
 static void draw_wpm_canvas(struct zmk_widget_status *widget) {
-    lv_obj_t *container = widget->obj;
+    lv_obj_t *canvas = widget->obj;
     const struct status_state *state = &widget->state;
+
+    memcpy(widget->cbuf, widget->bg_cbuf, sizeof(widget->cbuf));
+
+    lv_draw_label_dsc_t label_dsc_wpm;
+    init_label_dsc(&label_dsc_wpm, LVGL_FOREGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_RIGHT);
+    lv_draw_line_dsc_t line_dsc;
+    init_line_dsc(&line_dsc, LVGL_FOREGROUND, 1);
 
     char wpm_text[6] = {};
     snprintf(wpm_text, sizeof(wpm_text), "%d", state->wpm[9]);
-    
-    // Create or update WPM label
-    if (!widget->wpm_label) {
-        widget->wpm_label = lv_label_create(container);
-        lv_obj_set_style_text_color(widget->wpm_label, LVGL_FOREGROUND, 0);
-        lv_obj_set_style_text_font(widget->wpm_label, &lv_font_unscii_8, 0);
-        lv_obj_set_pos(widget->wpm_label, 42, 52);
-        lv_obj_set_size(widget->wpm_label, 24, 8);
-    }
-    lv_label_set_text(widget->wpm_label, wpm_text);
+    lv_canvas_draw_text(canvas, 42, 52, 24, &label_dsc_wpm, wpm_text);
 
-    // For now, skip the complex line chart drawing since it requires canvas
-    // TODO: Implement line chart using LVGL chart widget or simple line objects
+    int max = 0;
+    int min = 256;
+
+    for (int i = 0; i < 10; i++) {
+        if (state->wpm[i] > max) {
+            max = state->wpm[i];
+        }
+        if (state->wpm[i] < min) {
+            min = state->wpm[i];
+        }
+    }
+
+    int range = max - min;
+    if (range == 0) {
+        range = 1;
+    }
+
+    lv_point_t points[10];
+    for (int i = 0; i < 10; i++) {
+        points[i].x = 2 + i * 7;
+        points[i].y = 60 - (state->wpm[i] - min) * 36 / range;
+    }
+    lv_canvas_draw_line(canvas, points, 10, &line_dsc);
 }
 
 static void set_wpm_status(struct zmk_widget_status *widget, struct wpm_status_state state) {
@@ -92,26 +114,9 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_wpm_status, struct wpm_status_state, wpm_stat
 ZMK_SUBSCRIPTION(widget_wpm_status, zmk_wpm_state_changed);
 
 int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
-    // Create a simple container instead of canvas
-    widget->obj = lv_obj_create(parent);
+    widget->obj = lv_canvas_create(parent);
     lv_obj_set_size(widget->obj, CANVAS_SIZE_W, CANVAS_SIZE_H);
-    lv_obj_set_style_bg_color(widget->obj, LVGL_BACKGROUND, 0);
-    lv_obj_set_style_border_color(widget->obj, LVGL_FOREGROUND, 0);
-    lv_obj_set_style_border_width(widget->obj, 1, 0);
-    lv_obj_clear_flag(widget->obj, LV_OBJ_FLAG_SCROLLABLE);
-
-    // Initialize buffer for compatibility
-    memset(widget->cbuf, 0, sizeof(widget->cbuf));
-    memset(widget->bg_cbuf, 0, sizeof(widget->bg_cbuf));
-    
-    // Initialize object pointers
-    widget->chart_bg = NULL;
-    widget->wpm_label = NULL;
-    
-    // Initialize WPM state
-    for (int i = 0; i < 10; i++) {
-        widget->state.wpm[i] = 0;
-    }
+    lv_canvas_set_buffer(widget->obj, widget->cbuf, CANVAS_SIZE_W, CANVAS_SIZE_H, LV_IMG_CF_TRUE_COLOR);
 
     draw_wpm_background(widget);
     draw_wpm_canvas(widget);
