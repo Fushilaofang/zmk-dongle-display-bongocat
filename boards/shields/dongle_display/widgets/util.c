@@ -18,25 +18,6 @@ void rotate_canvas(lv_obj_t *canvas) {
                       LV_DISPLAY_ROTATION_270, CANVAS_COLOR_FORMAT);
 }
 
-void draw_battery(lv_obj_t *canvas, const struct status_state *state) {
-    lv_draw_rect_dsc_t rect_black_dsc;
-    init_rect_dsc(&rect_black_dsc, LVGL_BACKGROUND);
-    lv_draw_rect_dsc_t rect_white_dsc;
-    init_rect_dsc(&rect_white_dsc, LVGL_FOREGROUND);
-
-    canvas_draw_rect(canvas, 0, 2, 29, 12, &rect_white_dsc);
-    canvas_draw_rect(canvas, 1, 3, 27, 10, &rect_black_dsc);
-    canvas_draw_rect(canvas, 2, 4, (state->battery * 25) / 100, 8, &rect_white_dsc);
-    canvas_draw_rect(canvas, 30, 5, 3, 6, &rect_white_dsc);
-    canvas_draw_rect(canvas, 31, 6, 1, 4, &rect_black_dsc);
-
-    if (state->charging) {
-        lv_draw_image_dsc_t img_dsc;
-        lv_draw_image_dsc_init(&img_dsc);
-        canvas_draw_img(canvas, 9, -1, &bolt, &img_dsc);
-    }
-}
-
 void init_label_dsc(lv_draw_label_dsc_t *label_dsc, lv_color_t color, const lv_font_t *font,
                     lv_text_align_t align) {
     lv_draw_label_dsc_init(label_dsc);
