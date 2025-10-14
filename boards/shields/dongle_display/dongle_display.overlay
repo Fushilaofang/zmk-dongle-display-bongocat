@@ -42,8 +42,8 @@
             compatible = "sitronix,st7305";
             mipi-max-frequency = <10000000>;
             reg = <0>;
-            height = <200>;
             width = <200>;
+            height = <200>;
             start-line = <0>;
             start-column = <0>;
             nvm-load = [17 02];
