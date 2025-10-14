@@ -22,16 +22,16 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
-LV_IMG_DECLARE(sym_usb);
-LV_IMG_DECLARE(sym_bt);
-LV_IMG_DECLARE(sym_ok);
-LV_IMG_DECLARE(sym_nok);
-LV_IMG_DECLARE(sym_open);
-LV_IMG_DECLARE(sym_1);
-LV_IMG_DECLARE(sym_2);
-LV_IMG_DECLARE(sym_3);
-LV_IMG_DECLARE(sym_4);
-LV_IMG_DECLARE(sym_5);
+LV_IMAGE_DECLARE(sym_usb);
+LV_IMAGE_DECLARE(sym_bt);
+LV_IMAGE_DECLARE(sym_ok);
+LV_IMAGE_DECLARE(sym_nok);
+LV_IMAGE_DECLARE(sym_open);
+LV_IMAGE_DECLARE(sym_1);
+LV_IMAGE_DECLARE(sym_2);
+LV_IMAGE_DECLARE(sym_3);
+LV_IMAGE_DECLARE(sym_4);
+LV_IMAGE_DECLARE(sym_5);
 
 const lv_image_dsc_t *sym_num[] = {
     &sym_1,
@@ -131,25 +131,25 @@ static void set_status_symbol(lv_obj_t *widget, struct output_status_state state
     }
 
     if (state.usb_is_hid_ready) {
-        lv_img_set_src(usb_hid_status, &sym_ok);
+        lv_image_set_src(usb_hid_status, &sym_ok);
     } else {
-        lv_img_set_src(usb_hid_status, &sym_nok);
+        lv_image_set_src(usb_hid_status, &sym_nok);
     }
 
     if (state.active_profile_index < (sizeof(sym_num) / sizeof(lv_image_dsc_t *))) {
-        lv_img_set_src(bt_number, sym_num[state.active_profile_index]);
+        lv_image_set_src(bt_number, sym_num[state.active_profile_index]);
     } else {
-        lv_img_set_src(bt_number, &sym_nok);
+        lv_image_set_src(bt_number, &sym_nok);
     }
     
     if (state.active_profile_bonded) {
         if (state.active_profile_connected) {
-            lv_img_set_src(bt_status, &sym_ok);
+            lv_image_set_src(bt_status, &sym_ok);
         } else {
-            lv_img_set_src(bt_status, &sym_nok);
+            lv_image_set_src(bt_status, &sym_nok);
         }
     } else {
-        lv_img_set_src(bt_status, &sym_open);
+        lv_image_set_src(bt_status, &sym_open);
     }
 }
 
@@ -169,21 +169,21 @@ int zmk_widget_output_status_init(struct zmk_widget_output_status *widget, lv_ob
 
     lv_obj_set_size(widget->obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
 
-    lv_obj_t *usb = lv_img_create(widget->obj);
+    lv_obj_t *usb = lv_image_create(widget->obj);
     lv_obj_align(usb, LV_ALIGN_TOP_LEFT, 1, 4);
-    lv_img_set_src(usb, &sym_usb);
+    lv_image_set_src(usb, &sym_usb);
 
-    lv_obj_t *usb_hid_status = lv_img_create(widget->obj);
+    lv_obj_t *usb_hid_status = lv_image_create(widget->obj);
     lv_obj_align_to(usb_hid_status, usb, LV_ALIGN_BOTTOM_LEFT, 2, -7);
 
-    lv_obj_t *bt = lv_img_create(widget->obj);
+    lv_obj_t *bt = lv_image_create(widget->obj);
     lv_obj_align_to(bt, usb, LV_ALIGN_OUT_RIGHT_TOP, 6, 0);
-    lv_img_set_src(bt, &sym_bt);
+    lv_image_set_src(bt, &sym_bt);
 
-    lv_obj_t *bt_number = lv_img_create(widget->obj);
+    lv_obj_t *bt_number = lv_image_create(widget->obj);
     lv_obj_align_to(bt_number, bt, LV_ALIGN_OUT_RIGHT_TOP, 2, 7);
 
-    lv_obj_t *bt_status = lv_img_create(widget->obj);
+    lv_obj_t *bt_status = lv_image_create(widget->obj);
     lv_obj_align_to(bt_status, bt, LV_ALIGN_OUT_RIGHT_TOP, 2, 1);
     
     static lv_style_t style_line;

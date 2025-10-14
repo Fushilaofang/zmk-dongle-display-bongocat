@@ -8,8 +8,6 @@
 #include <zephyr/kernel.h>
 #include "util.h"
 
-LV_IMG_DECLARE(bolt);
-
 void rotate_canvas(lv_obj_t *canvas) {
     uint8_t *buf = lv_canvas_get_draw_buf(canvas)->data;
     static uint8_t buf_copy[CANVAS_BUF_SIZE];

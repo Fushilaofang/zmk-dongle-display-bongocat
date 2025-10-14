@@ -30,26 +30,26 @@ struct modifier_symbol {
     bool is_active;
 };
 
-LV_IMG_DECLARE(control_icon);
+LV_IMAGE_DECLARE(control_icon);
 struct modifier_symbol ms_control = {
     .modifier = MOD_LCTL | MOD_RCTL,
     .symbol_dsc = &control_icon,
 };
 
-LV_IMG_DECLARE(shift_icon);
+LV_IMAGE_DECLARE(shift_icon);
 struct modifier_symbol ms_shift = {
     .modifier = MOD_LSFT | MOD_RSFT,
     .symbol_dsc = &shift_icon,
 };
 
 #if IS_ENABLED(CONFIG_ZMK_DONGLE_DISPLAY_MAC_MODIFIERS)
-LV_IMG_DECLARE(opt_icon);
+LV_IMAGE_DECLARE(opt_icon);
 struct modifier_symbol ms_opt = {
     .modifier = MOD_LALT | MOD_RALT,
     .symbol_dsc = &opt_icon,
 };
 
-LV_IMG_DECLARE(cmd_icon);
+LV_IMAGE_DECLARE(cmd_icon);
 struct modifier_symbol ms_cmd = {
     .modifier = MOD_LGUI | MOD_RGUI,
     .symbol_dsc = &cmd_icon,
@@ -63,13 +63,13 @@ struct modifier_symbol *modifier_symbols[] = {
     &ms_shift
 };
 #else
-LV_IMG_DECLARE(alt_icon);
+LV_IMAGE_DECLARE(alt_icon);
 struct modifier_symbol ms_alt = {
     .modifier = MOD_LALT | MOD_RALT,
     .symbol_dsc = &alt_icon,
 };
 
-LV_IMG_DECLARE(win_icon);
+LV_IMAGE_DECLARE(win_icon);
 struct modifier_symbol ms_win = {
     .modifier = MOD_LGUI | MOD_RGUI,
     .symbol_dsc = &win_icon,
@@ -147,9 +147,9 @@ int zmk_widget_modifiers_init(struct zmk_widget_modifiers *widget, lv_obj_t *par
     static const lv_point_t selection_line_points[] = { {0, 0}, {SIZE_SYMBOLS, 0} };
 
     for (int i = 0; i < NUM_SYMBOLS; i++) {
-        modifier_symbols[i]->symbol = lv_img_create(widget->obj);
+        modifier_symbols[i]->symbol = lv_image_create(widget->obj);
         lv_obj_align(modifier_symbols[i]->symbol, LV_ALIGN_TOP_LEFT, 1 + (SIZE_SYMBOLS + 1) * i, 1);
-        lv_img_set_src(modifier_symbols[i]->symbol, modifier_symbols[i]->symbol_dsc);
+        lv_image_set_src(modifier_symbols[i]->symbol, modifier_symbols[i]->symbol_dsc);
 
         modifier_symbols[i]->selection_line = lv_line_create(widget->obj);
         lv_line_set_points(modifier_symbols[i]->selection_line, selection_line_points, 2);
