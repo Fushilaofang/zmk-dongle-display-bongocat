@@ -3,38 +3,4 @@
  *
  * SPDX-License-Identifier: MIT
  */
-    
-&st7305_spi {
-    status = "okay";
-    st7305: st7305@0 {
-        compatible = "sitronix,st7305";
-        cmd-data-gpios = <&gpio0 20 GPIO_ACTIVE_HIGH>;
-	    reset-gpios = <&gpio0 17 GPIO_ACTIVE_LOW>;
-        spi-max-frequency = <10000000>;
-        reg = <0>;
-        width = <168>;
-		height = <384>;
-		start-line = <0>;
-		start-column = <48>;
-        nvm-load = [17 02];
-        gate-voltages = [11 04];
-        vsh = [41 41 41 41];
-    	vsl = [19 19 19 19];
-    	shn = [41 41 41 41];
-    	vsln = [19 19 19 19];
-        osc-settings = <0xA6>;
-    	framerate = <0x5>;
-		multiplex-ratio = <0x64>;
-    	source-voltage = <0x0>;
-		remap-value = <0x40>;
-	    panel-settings = <0x29>;        
-    };
-};
-
-/ {
-    chosen {
-        zephyr,display = &st7305;
-    };    
-};
-
  
