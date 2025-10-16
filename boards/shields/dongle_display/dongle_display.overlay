@@ -8,7 +8,9 @@
     status = "okay";
     st7305: st7305@0 {
         compatible = "sitronix,st7305";
-        mipi-max-frequency = <10000000>;
+        cmd-data-gpios = <&gpio0 20 GPIO_ACTIVE_HIGH>;
+	    reset-gpios = <&gpio0 17 GPIO_ACTIVE_LOW>;
+        spi-max-frequency = <10000000>;
         reg = <0>;
         width = <200>;
 		height = <200>;
