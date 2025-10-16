@@ -12,10 +12,10 @@
 	    reset-gpios = <&gpio0 17 GPIO_ACTIVE_LOW>;
         spi-max-frequency = <10000000>;
         reg = <0>;
-        width = <200>;
-		height = <200>;
+        width = <168>;
+		height = <384>;
 		start-line = <0>;
-		start-column = <50>;
+		start-column = <48>;
         nvm-load = [17 02];
         gate-voltages = [11 04];
         vsh = [41 41 41 41];
