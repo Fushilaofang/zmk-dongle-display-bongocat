@@ -15,7 +15,7 @@
         width = <200>;
 		height = <200>;
 		start-line = <0>;
-		start-column = <0>;
+		start-column = <50>;
         nvm-load = [17 02];
         gate-voltages = [11 04];
         vsh = [41 41 41 41];
