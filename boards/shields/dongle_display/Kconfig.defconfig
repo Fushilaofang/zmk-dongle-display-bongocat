@@ -18,6 +18,34 @@ config ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
     select ZMK_WPM
     imply ZMK_HID_INDICATORS
 
+config DISPLAY
+	default y
+
+config ST730X
+	bool "ST730x display controllers driver"
+	default y
+	depends on DT_HAS_SITRONIX_ST7305_ENABLED || DT_HAS_SITRONIX_ST7306_ENABLED
+	select MIPI_DBI
+	help
+	  Enable driver for ST730X series display controllers.
+
+config ST730X_CONV_BUFFER_LINE_CNT
+	int "Size of the conversion buffer in lines"
+	default 8
+	range 1 1024
+	help
+	  Size of the conversion buffer in lines.
+
+# 根据需要选择功耗模式
+config ST730X_POWERMODE_LOW
+    bool "Use low power mode"
+  	default n
+  	help
+  	  Enable this to use lower framerate LPM (Low Power Mode).
+
+config SPI
+	default y
+
 config ZMK_DONGLE_DISPLAY_DONGLE_BATTERY
     bool "Show also the battery level of the dongle"
     depends on BT && (!ZMK_SPLIT_BLE || ZMK_SPLIT_ROLE_CENTRAL)
@@ -50,6 +78,9 @@ config LV_Z_MEM_POOL_SIZE
 
 config LV_Z_VDB_SIZE
     default 64
+
+config LV_Z_DOUBLE_VDB
+	default n
 
 config LV_DPI_DEF
     default 148
