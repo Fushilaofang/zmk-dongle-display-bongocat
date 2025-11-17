@@ -3,20 +3,3 @@
  *
  * SPDX-License-Identifier: MIT
  */
-
- &ls0xx_ls013b7dh03_spi {
-    status = "okay";
-    ls0xx_ls013b7dh03: ls0xx@0 {
-        compatible = "sharp,ls0xx";
-        spi-max-frequency = <2000000>;
-        reg = <0>;
-        width = <128>;
-        height = <128>;
-    };
-};
-
-/ {
-    chosen {
-        zephyr,display = &ls0xx_ls013b7dh03;
-    };
-};
